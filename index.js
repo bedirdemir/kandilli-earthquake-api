@@ -12,14 +12,48 @@ app.use((req, res, next) => {
   next();
 });
 
+const selectCity = (text) =>{
+  let myCity = text.split(" ");
+  myCity.splice(0,2);
+  myCity.splice(myCity.length - 2, 2);
+  myCity = myCity.toString();
+  return myCity
+};
+
+const selectDetails = (text) =>{
+  let myArray = text.split(" ");
+  return myArray
+};
+
 app.get("/", (req, res) => {
   axios.get('http://koeri.boun.edu.tr/rss/')
   .then(function (response) {
     // handle success
     parseString(response.data, function (err, result) {
+      
+      let list = result.rss.channel[0].item;
+      let earthquakeList = [];
+
+      for(i = 0; i < list.length; i++){
+        const city = selectCity(list[i].title[0]);
+        const details = selectDetails(list[i].description[0]);
+
+        const item = {
+          city: city,
+          date: details[0],
+          time: details[1],
+          magnitude: details[2],
+          scale: details[3],
+          lat: details[4],
+          long: details[5],
+          depth: details[6]
+        };
+        earthquakeList.push(item);
+      };
+
       res.format({
         json: () => {
-          res.send(result.rss.channel[0].item);
+          res.send(earthquakeList);
         }
       });
     });
