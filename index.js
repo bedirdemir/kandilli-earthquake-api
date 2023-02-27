@@ -39,7 +39,7 @@ app.get("/", (req, res) => {
         const details = selectDetails(list[i].description[0]);
 
         const item = {
-          city: city,
+          region: city,
           date: details[0],
           time: details[1],
           magnitude: details[2],
