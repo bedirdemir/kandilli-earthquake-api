@@ -1,23 +1,13 @@
 const express = require("express");
 var parseString = require('xml2js').parseString;
 const axios = require('axios').default;
-
 const app = express();
-
-app.use((req, res, next) => {
-  res.header({
-    'Access-Control-Allow-Origin': '*',
-    'Cache-Control': 'no-store'
-  });
-  next();
-});
 
 const selectCity = (text) =>{
   let myCity = text.split(" ");
   myCity.splice(0,2);
   myCity.splice(myCity.length - 2, 2);
-  myCity = myCity.toString();
-  return myCity
+  return myCity.join(" ");
 };
 
 const selectDetails = (text) =>{
@@ -25,7 +15,7 @@ const selectDetails = (text) =>{
   return myArray
 };
 
-app.get("/", (req, res) => {
+app.get("/last/:p", (req, res) => {
   axios.get('http://koeri.boun.edu.tr/rss/')
   .then(function (response) {
     // handle success
@@ -34,7 +24,7 @@ app.get("/", (req, res) => {
       let list = result.rss.channel[0].item;
       let earthquakeList = [];
 
-      for(i = 0; i < list.length; i++){
+      for(i = 0; i < req.params.p; i++){
         const city = selectCity(list[i].title[0]);
         const details = selectDetails(list[i].description[0]);
 
@@ -50,7 +40,10 @@ app.get("/", (req, res) => {
         };
         earthquakeList.push(item);
       };
-
+      res.header({
+        'Access-Control-Allow-Origin': '*',
+        'Cache-Control': 'no-store'
+      });
       res.format({
         json: () => {
           res.send(earthquakeList);
