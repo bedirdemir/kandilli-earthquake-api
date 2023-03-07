@@ -42,7 +42,7 @@ app.get("/last/:p", (req, res) => {
       };
       res.header({
         'Access-Control-Allow-Origin': '*',
-        'Cache-Control': 'max-age=0, s-maxage=86400'
+        'Cache-Control': 's-maxage=0, stale-while-revalidate'
       });
       res.format({
         json: () => {
